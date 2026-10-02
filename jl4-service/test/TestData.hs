@@ -45,6 +45,8 @@ module TestData (
   deonticDefaultJL4,
   spinJL4,
   spinOrRefuseJL4,
+  deonticSectionDefaultJL4,
+  directivesAboveDefaultJL4,
 ) where
 
 import Backend.Jl4 as Jl4
@@ -968,4 +970,55 @@ GIVETH A BOOLEAN
 DECIDE spin IF
   IF n < 0 THEN REFUSE "n is negative"
   ELSE `count down` n EQUALS 0
+|]
+
+-- | A deontic rule that reads a section GIVEN's default: the wrapper's module
+-- is named for the function, so the range the evaluation reports names the
+-- function's file and not the author's (W8 review F2).
+deonticSectionDefaultJL4 :: Text
+deonticSectionDefaultJL4 =
+  [i|
+DECLARE Driver HAS
+    name IS A STRING
+
+DECLARE `Driver Action` IS ONE OF
+    `wear seatbelt`
+    `drive`
+
+§ `Roads`
+    GIVEN `is motorway` IS A BOOLEAN TYPICALLY FALSE
+
+    @export default belt rule
+    GIVEN driver        IS A Driver
+    GIVETH A PROVISION OF Driver, `Driver Action`
+    `belt rule` MEANS
+        IF      `is motorway`
+        THEN    PARTY driver
+                MUST `wear seatbelt`
+                WITHIN 1
+        ELSE    PARTY driver
+                MAY `drive`
+|]
+
+-- | A section GIVEN's default declared below directives. The wrapper is
+-- evaluated from the source with its directives removed, which used to move
+-- every line below them up (W8 review F2).
+directivesAboveDefaultJL4 :: Text
+directivesAboveDefaultJL4 =
+  [i|
+GIVETH A NUMBER
+base MEANS 10
+
+\#EVAL base
+
+\#EVAL base
+
+§ `Capacity`
+    GIVEN `has capacity` IS A BOOLEAN TYPICALLY TRUE
+
+@export default may contract
+GIVEN `is adult`    IS A BOOLEAN
+      `unused flag` IS A BOOLEAN
+GIVETH A BOOLEAN
+`may contract` MEANS `has capacity` AND `is adult`
 |]
