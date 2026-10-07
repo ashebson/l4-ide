@@ -26,6 +26,7 @@ module TestData (
   deonticBooleanJL4,
   considerBooleanJL4,
   decidedAnywayJL4,
+  bareInputJL4,
   deonticConsiderJL4,
   maybeInputsJL4,
   timeInputsJL4,
@@ -1011,4 +1012,17 @@ GIVETH A BOOLEAN
 DECIDE spin IF
   IF n < 0 THEN REFUSE "n is negative"
   ELSE `count down` n EQUALS 0
+|]
+
+-- | A rule whose answer, when its second input is TRUE, is its first input
+-- itself: @p AND TRUE@ is @p@. On the wrapper path (a @{}@ in the request) that
+-- answer sits inside the wrapper's JUST.
+bareInputJL4 :: Text
+bareInputJL4 =
+  [i|
+@export default gate
+GIVEN p IS A BOOLEAN
+      q IS A BOOLEAN
+GIVETH A BOOLEAN
+gate MEANS p AND q
 |]
